@@ -1,5 +1,5 @@
 import random
-from idlelib.search import find_again
+import secrets
 
 
 def generate_random_words():
@@ -34,14 +34,26 @@ def generate_random_words():
 
     word_quant = 3
     three_random_words = []
+    capitalized_words = []
 
     for i in range (word_quant):
-        random_index = random.randrange(len(possible_words))
+        random_index = secrets.randbelow(len(possible_words))
         random_word = possible_words[random_index]
 
         three_random_words.append(random_word)
 
-    return three_random_words
+    for word in three_random_words:
+        cap_word = ""
+
+        for char in word:
+            if secrets.randbelow(2) == 0:
+                cap_word += char.upper()
+            else:
+                cap_word += char
+
+        capitalized_words.append(cap_word)
+
+    return capitalized_words
 
 
 def generate_random_numbers():
@@ -57,7 +69,7 @@ def generate_random_numbers():
     # write 3 random words to the list
     for i in range(num_quant):
 
-        rand_num = random.randint(1,9)
+        rand_num = secrets.randbelow(9)+1
 
         if rand_num in random_numbers:
             rand_num += 1
@@ -77,12 +89,45 @@ def generate_random_symbols():
     symbol_quant = 3
 
     for i in range(symbol_quant):
-        random_index = random.randrange(len(symbols))
+        random_index = secrets.randbelow(len(symbols))
         random_symbol = symbols[random_index]
 
         three_random_symbols.append(random_symbol)
 
     return three_random_symbols
+
+def apply_character_swap(word_list):
+    # a dictionary to store common letter swaps
+    swaps = {
+        'a': '4',
+        'e': '3',
+        'i': '1',
+        'o': '0',
+        's': '5',
+        't': '7'
+    }
+
+    # a translation table executes multiple character swaps in a single pass
+    translation_table = str.maketrans(swaps)
+
+    # list to store modified words
+    swapped_word_list = []
+
+    # a loop to iterate through each word and apply character swap
+    for word in word_list:
+        swapped_word = ""
+        for char in word:
+            fifty_fifty_chance = secrets.randbelow(2)
+
+            if char in swaps and fifty_fifty_chance == 0:
+                swapped_word += swaps[char]
+            else:
+                swapped_word += char
+
+        swapped_word_list.append(swapped_word)
+
+    return swapped_word_list
+
 
 def create_password():
     """
@@ -93,16 +138,23 @@ def create_password():
 
     To create a password
     """
+
     # call all 3 generation methods
     words = generate_random_words()
+    print(words)
+
+    swapped_words = apply_character_swap(words)
+
     numbers = generate_random_numbers()
     symbols = generate_random_symbols()
 
     # concatenate into a single list
-    concatenated_password = words + numbers + symbols
+    concatenated_password = swapped_words + numbers + symbols
 
     # shuffle the concatenated list
-    random.shuffle(concatenated_password)
+    for i in range(5):
+        secrets.SystemRandom().shuffle(concatenated_password)
+
 
     # join concatenated list into a single string
     final_password = "".join(concatenated_password)
